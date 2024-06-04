@@ -7,4 +7,6 @@ vault write auth/jwt/config \
 
 vault policy write tfc-policy tfc-policy.hcl
 
+sh scripts/generate-auth-role.sh
+
 vault write auth/jwt/role/tfc-role @vault-jwt-auth-role.json

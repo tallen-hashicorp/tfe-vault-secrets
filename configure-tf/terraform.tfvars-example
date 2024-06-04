@@ -1,3 +1,5 @@
 tfe_token = "your-tfe-token"
 tfe_organization = "your-tfe-org"
 vault_addr = "your-vault-public-addr"
+aws_access_key_id = "your-aws-access-key-id"
+aws_secret_access_key = "your-aws-secret-access-key"

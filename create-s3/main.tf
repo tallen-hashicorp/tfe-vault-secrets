@@ -27,3 +27,18 @@ provider "vault" {
     filename = var.tfc_vault_dynamic_credentials.aliases["ALIAS1"].token_filename
   }
 }
+
+resource "random_string" "random_string" {
+  length  = 4
+  special = false
+  upper   = false
+}
+
+data "vault_kv_secret_v2" "my-secret" {
+  mount = "secret"
+  name  = "my-secret"
+}
+
+resource "aws_s3_bucket" "example_bucket" {
+  bucket = "${random_string.random_string.result}-${data.vault_kv_secret_v2.my-secret.data["bucket_name"]}"
+}

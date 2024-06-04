@@ -20,7 +20,14 @@ vault login
 ```
 
 ## Configure Vault
-Run the following commands after logging in, alternaitvly run `sh scripts/01-configure-vault.sh`
+Run the following commands after logging in, alternaitvly run `sh scripts/01-configure-vault.sh`.
+
+First we need to ensure the [bound claim](https://developer.hashicorp.com/terraform/cloud-docs/workspaces/dynamic-provider-credentials/workload-identity-tokens#custom-claims) for TFC is setip, run the following command to set the org id in `vault-jwt-auth-role.json` we will bind to the workspace named `vault-secret-example-workspace` which we setip later.
+
+```bash
+sh scripts/generate-auth-role.sh
+```
+
 ```bash
 vault auth enable jwt
 
@@ -37,7 +44,7 @@ vault write auth/jwt/role/tfc-role @vault-jwt-auth-role.json
 This secret will be used by TF later, use the following to create this, altnaitlvy run `sh scripts/02-setup-vault-secrets.sh`
 ```bash
 vault secrets enable -version=2 -path=secret kv 
-vault kv put -mount=secret my-secret name=s3-secretname
+vault kv put -mount=secret my-secret bucket_name=s3-secret-bucket-name
 ```
 
 # TFC
@@ -60,6 +67,13 @@ Next update `tfe_organization = "your-tfe-org"` in `terraform.tfvars` with your 
 
 Now update `vault_addr = "your-vault-public-addr""` in `terraform.tfvars` with your Vault Public address.
 
+Now set your AWS Key ID and Secret Sccess Key by updating the following in in `terraform.tfvars` with your AWS creds.
+```text
+aws_access_key_id = "your-aws-access-key-id"
+aws_secret_access_key = "your-aws-secret-access-key"
+```
+
+
 Now you can run the required terraform to setup the new workspace
 ```bash
 terraform init
@@ -72,7 +86,7 @@ Now we have setup Vault and the TFC workspace we can use it to create a S3 bucke
 All of the following is in the `create-ec2` folder
 ```bash
 cd ..
-cd create-ec2
+cd create-s3
 ```
 
 Next update `organization = "tallen-playground"` on line 3 of `main.tf` with your TFC org.
@@ -85,4 +99,9 @@ terraform login
 Now run the terrafrom
 ```bash
 terraform init 
+terraform apply
 ```
+
+This will now create a s3 bucket with wich will look something like the following `43qr-s3-secret-bucket-name`, the fist 4 charictors are random to avoid conflights, however `s3-secret-bucket-name` was retrieved from Vault. 
+
+If you want to confirm this you can update the secret in vault with the command `vault kv put -mount=secret my-secret bucket_name=new-bucket`, then rerun `terraform apply` this will change the name of the bucket to something like `43qr-new-bucket`. Its worth noting this action will delete the orignal bucket so do not use this for actual production resourcs, this is just a simple example on how to use vault secrets in terraform. 
