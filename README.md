@@ -4,6 +4,9 @@ Injecting Vault KV secret into TFE variable example, using details which can be 
 ## Prereq
 * A Vault HCP Dedicated Cluster
 * A TFC Account
+* A AWS Account
+
+# Vault Setup
 
 ## Login to Vault
 First setup your envrioment variables, change http://127.0.0.1:8200 to your HCP Vault address, alternativly you can copy by clicking Quick Actions > How to access via > Command-line (CLI) > Copy Use Public Url
@@ -35,4 +38,30 @@ This secret will be used by TF later, use the following to create this, altnaitl
 ```bash
 vault secrets enable -version=2 -path=secret kv 
 vault kv put -mount=secret my-secret name=ec2-secretname qty=5
+```
+
+# TFC
+
+## TFC Workspace Setup
+All of the following is in the `configure-tf` folder
+``bash
+cd configure-tf
+```
+
+## GET TFC API Token,
+Copy the example tfvars with the following command
+```bash
+cp terraform.tfvars-example terraform.tfvars
+```
+
+Now you need to get an User Token from TFC, to do this go to Account Settings > Tokens > Generate API Token, a new token will be generated copy this and update `tfe_token = "your-tfe-token"` with your token in `terraform.tfvars`
+
+Next update `tfe_organization = "your-tfe-org"` in `terraform.tfvars` with your TFC org. 
+
+Now update `vault_addr = "your-vault-public-addr""` in `terraform.tfvars` with your Vault Public address.
+
+Now you can run the required terraform to setup the new workspace
+```bash
+terraform init
+terraform apply
 ```

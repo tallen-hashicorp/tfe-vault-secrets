@@ -1,0 +1,3 @@
+tfe_token = "your-tfe-token"
+tfe_organization = "your-tfe-org"
+vault_addr = "your-vault-public-addr"
