@@ -37,7 +37,7 @@ vault write auth/jwt/role/tfc-role @vault-jwt-auth-role.json
 This secret will be used by TF later, use the following to create this, altnaitlvy run `sh scripts/02-setup-vault-secrets.sh`
 ```bash
 vault secrets enable -version=2 -path=secret kv 
-vault kv put -mount=secret my-secret name=ec2-secretname qty=5
+vault kv put -mount=secret my-secret name=s3-secretname
 ```
 
 # TFC
@@ -64,4 +64,25 @@ Now you can run the required terraform to setup the new workspace
 ```bash
 terraform init
 terraform apply
+```
+
+## TFC Running TF With Vault Creds
+Now we have setup Vault and the TFC workspace we can use it to create a S3 bucket instance with the name `s3-secretname` as defined ealier with the command `vault kv put -mount=secret my-secret name=s3-secretname`
+
+All of the following is in the `create-ec2` folder
+```bash
+cd ..
+cd create-ec2
+```
+
+Next update `organization = "tallen-playground"` on line 3 of `main.tf` with your TFC org.
+
+We now need to login to TFC with the following command, follow the instructions on the popup website
+```bash
+terraform login
+```
+
+Now run the terrafrom
+```bash
+terraform init 
 ```
